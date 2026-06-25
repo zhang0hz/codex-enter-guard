@@ -12,7 +12,7 @@
 
 ## 下载安装
 
-1. 在 GitHub Release 里下载 `Codex防误发.app.zip`。
+1. 在仓库的 `dist/` 目录里下载 `Codex防误发.app.zip`。
 2. 解压后得到 `CodexSendGuard.app`。
 3. 建议把它拖到“应用程序”文件夹。
 4. 双击启动后，菜单栏会出现 `⌘↵`。
