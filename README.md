@@ -13,10 +13,16 @@
 ## 下载安装
 
 1. 在仓库的 `dist/` 目录里下载 `Codex防误发.app.zip`。
-2. 解压后得到 `CodexSendGuard.app`。
+2. 解压后得到 `Codex 防误发.app`。
 3. 建议把它拖到“应用程序”文件夹。
 4. 双击启动后，菜单栏会出现 `⌘↵`。
 5. 第一次启动时，根据状态窗口提示授予权限。
+
+当前 `dist/` 里的预编译版本仅支持 Apple Silicon Mac。
+
+当前预编译包使用本地 ad-hoc 签名，未做 Apple Developer ID 公证，所以首次打开时可能会被 macOS Gatekeeper 拦截。
+
+如果 macOS 提示“无法验证开发者”或拦截首次打开，可以在 Finder 里右键点击 `Codex 防误发.app`，选择“打开”，再按系统提示确认。不要从陌生来源下载同名 App。
 
 ## 权限
 
@@ -26,6 +32,8 @@ macOS 会要求授予两个权限：
 - 输入监控
 
 原因是这个工具需要在系统层面监听并改写键盘事件。工具不会修改 Codex 本体，也不会联网。
+
+需要说明的是：macOS 授予的是全局键盘事件访问权限；本工具会在本机收到键盘事件后，只在 Codex 位于前台、且按下普通回车时改写为换行。
 
 如果重新编译或重新签名 App，macOS 可能会把它当成一个新的程序，需要重新授予权限。
 
@@ -57,11 +65,13 @@ macOS 会要求授予两个权限：
 进入“系统设置”：
 
 1. 打开“隐私与安全性”。
-2. 进入“辅助功能”，打开 `Codex 防误发` 或 `CodexSendGuard`。
-3. 进入“输入监控”，打开 `Codex 防误发` 或 `CodexSendGuard`。
+2. 进入“辅助功能”，打开 `Codex 防误发`。
+3. 进入“输入监控”，打开 `Codex 防误发`。
 4. 退出并重新打开 App。
 
-如果列表里有旧名字或重复项，可以先删除旧项，再重新添加当前 App。
+如果系统列表里仍显示 `CodexSendGuard`，它和 `Codex 防误发` 是同一个工具的内部可执行文件名。若列表里有旧名字或重复项，可以先删除旧项，再重新添加当前 App。
+
+如果系统设置里已经打开 `Codex 防误发`，但状态窗口仍然显示“需要授权”，通常是 macOS 还保留着旧版本 App 的授权记录。可以在状态窗口里点击“重置授权记录”，确认后退出并重新打开 App，再重新打开“辅助功能”和“输入监控”权限。
 
 ### 授权后还是不能拦截回车
 
@@ -86,20 +96,29 @@ swift build -c release
 
 ## 打包
 
-最终 App 包位于：
+生成可分发 zip：
 
-```text
-outputs/CodexSendGuard.app
+```bash
+Scripts/package.sh
 ```
 
-源码里的打包信息位于：
+脚本会生成：
 
 ```text
-work/CodexEnterGuard/Packaging/Info.plist
+dist/Codex防误发.app.zip
+dist/Codex防误发.app.zip.sha256
 ```
 
-其中用户可见名称是 `Codex 防误发`，Bundle Identifier 是 `local.codex-send-guard`，可执行文件名是 `CodexSendGuard`。
+源码里的打包信息位于 `Packaging/Info.plist`。其中用户可见名称是 `Codex 防误发`，Bundle Identifier 是 `local.codex-send-guard`，可执行文件名是 `CodexSendGuard`。
 
 ## 隐私说明
 
 这个工具只在本机运行，不联网，不上传数据，不读取 Codex 内容。它只检查当前前台 App 是否是 Codex，并在满足条件时把普通回车事件改成带 Shift 的回车事件。
+
+工具会写入本地诊断日志：
+
+```text
+~/Library/Logs/CodexSendGuard.log
+```
+
+日志用于排查启动、授权和监听状态问题，可能包含启动状态、权限状态、前台应用标识和按键码，不包含你输入的文本内容。

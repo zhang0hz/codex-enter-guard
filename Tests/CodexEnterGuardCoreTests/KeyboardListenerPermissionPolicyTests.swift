@@ -20,11 +20,42 @@ final class KeyboardListenerPermissionPolicyTests: XCTestCase {
         )
     }
 
+    func testCannotStartWhenBothPermissionsAreMissing() {
+        XCTAssertFalse(
+            KeyboardListenerPermissionPolicy.canAttemptListener(
+                accessibilityGranted: false,
+                inputMonitoringGranted: false
+            )
+        )
+    }
+
     func testCanStartWhenBothPermissionsAreGranted() {
         XCTAssertTrue(
             KeyboardListenerPermissionPolicy.canAttemptListener(
                 accessibilityGranted: true,
                 inputMonitoringGranted: true
+            )
+        )
+    }
+
+    func testAutoStartsWhenPermissionsBecomeReadyAndListenerIsStopped() {
+        XCTAssertTrue(
+            KeyboardListenerPermissionPolicy.shouldAutoStartListener(
+                accessibilityGranted: true,
+                inputMonitoringGranted: true,
+                listenerRunning: false,
+                protectionEnabled: true
+            )
+        )
+    }
+
+    func testDoesNotAutoStartWhenProtectionIsPaused() {
+        XCTAssertFalse(
+            KeyboardListenerPermissionPolicy.shouldAutoStartListener(
+                accessibilityGranted: true,
+                inputMonitoringGranted: true,
+                listenerRunning: false,
+                protectionEnabled: false
             )
         )
     }

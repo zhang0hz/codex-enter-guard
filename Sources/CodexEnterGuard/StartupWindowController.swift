@@ -9,12 +9,13 @@ final class StartupWindowController: NSWindowController {
     var onRequestPermissions: (() -> Void)?
     var onOpenAccessibilitySettings: (() -> Void)?
     var onOpenInputMonitoringSettings: (() -> Void)?
+    var onResetPermissions: (() -> Void)?
     var onRefresh: (() -> Void)?
     var onQuit: (() -> Void)?
 
     init() {
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 560, height: 380),
+            contentRect: NSRect(x: 0, y: 0, width: 560, height: 420),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
@@ -31,17 +32,9 @@ final class StartupWindowController: NSWindowController {
     }
 
     func update(status: GuardRuntimeStatus) {
-        if status.accessibilityGranted && status.inputMonitoringGranted && status.listenerRunning {
-            statusLabel.stringValue = "状态：已就绪"
-            detailLabel.stringValue =
-                "\(AppCopy.readyMessage)\n\n" +
-                GuardStatusFormatter.detailText(for: status)
-        } else {
-            statusLabel.stringValue = "状态：需要授权"
-            detailLabel.stringValue =
-                "\(AppCopy.permissionNoticeMessage)\n\n" +
-                GuardStatusFormatter.detailText(for: status)
-        }
+        let presentation = StartupStatusPresenter.presentation(for: status)
+        statusLabel.stringValue = presentation.title
+        detailLabel.stringValue = presentation.message
     }
 
     private func buildContentView() -> NSView {
@@ -56,6 +49,7 @@ final class StartupWindowController: NSWindowController {
         let requestButton = NSButton(title: "请求权限", target: self, action: #selector(requestPermissions))
         let accessibilityButton = NSButton(title: "打开辅助功能设置", target: self, action: #selector(openAccessibilitySettings))
         let inputButton = NSButton(title: "打开输入监控设置", target: self, action: #selector(openInputMonitoringSettings))
+        let resetButton = NSButton(title: "重置授权记录", target: self, action: #selector(resetPermissions))
         let refreshButton = NSButton(title: "刷新状态", target: self, action: #selector(refreshStatus))
         let quitButton = NSButton(title: "退出", target: self, action: #selector(quit))
 
@@ -69,7 +63,12 @@ final class StartupWindowController: NSWindowController {
         secondButtonRow.alignment = .centerY
         secondButtonRow.spacing = 10
 
-        let buttonRow = NSStackView(views: [firstButtonRow, secondButtonRow])
+        let thirdButtonRow = NSStackView(views: [resetButton])
+        thirdButtonRow.orientation = .horizontal
+        thirdButtonRow.alignment = .centerY
+        thirdButtonRow.spacing = 10
+
+        let buttonRow = NSStackView(views: [firstButtonRow, secondButtonRow, thirdButtonRow])
         buttonRow.orientation = .vertical
         buttonRow.alignment = .leading
         buttonRow.spacing = 10
@@ -104,6 +103,10 @@ final class StartupWindowController: NSWindowController {
 
     @objc private func openInputMonitoringSettings() {
         onOpenInputMonitoringSettings?()
+    }
+
+    @objc private func resetPermissions() {
+        onResetPermissions?()
     }
 
     @objc private func refreshStatus() {

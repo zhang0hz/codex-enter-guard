@@ -13,9 +13,7 @@ final class DiagnosticLogger: @unchecked Sendable {
     }
 
     func write(_ message: String) {
-        NSLog("Codex 防误发：\(message)")
-
-        queue.sync { [fileURL] in
+        queue.async { [fileURL] in
             let line = "\(ISO8601DateFormatter().string(from: Date())) \(message)\n"
             let data = Data(line.utf8)
 

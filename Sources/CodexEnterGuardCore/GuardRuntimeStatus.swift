@@ -55,8 +55,8 @@ public struct GuardRuntimeStatus: Equatable, Sendable {
 public enum GuardStatusFormatter {
     public static func detailText(for status: GuardRuntimeStatus) -> String {
         var lines = [
-            "辅助功能：\(status.accessibilityGranted ? "已开启" : "需要授权")",
-            "输入监控：\(status.inputMonitoringGranted ? "已开启" : "需要授权")",
+            "辅助功能：\(permissionStateText(isGranted: status.accessibilityGranted, listenerRunning: status.listenerRunning))",
+            "输入监控：\(permissionStateText(isGranted: status.inputMonitoringGranted, listenerRunning: status.listenerRunning))",
             "键盘监听：\(status.listenerRunning ? "开启" : "关闭")",
             "启动尝试：\(status.startAttemptCount)",
             "已看到按键：\(status.observedKeyDownCount)",
@@ -80,5 +80,17 @@ public enum GuardStatusFormatter {
         }
 
         return lines.joined(separator: "\n")
+    }
+
+    private static func permissionStateText(isGranted: Bool, listenerRunning: Bool) -> String {
+        if isGranted {
+            return "已开启"
+        }
+
+        if listenerRunning {
+            return "已通过监听验证"
+        }
+
+        return "需要授权"
     }
 }

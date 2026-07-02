@@ -83,4 +83,24 @@ final class GuardStatusFormatterTests: XCTestCase {
         XCTAssertTrue(text.contains("输入监控：已开启"))
         XCTAssertTrue(text.contains("键盘监听：开启"))
     }
+
+    func testShowsOperationalPermissionWhenListenerRunsDespiteStalePreflight() {
+        let status = GuardRuntimeStatus(
+            accessibilityGranted: false,
+            inputMonitoringGranted: false,
+            listenerRunning: true,
+            startAttemptCount: 3,
+            observedKeyDownCount: 1,
+            rewriteCount: 0,
+            lastFrontmostBundleIdentifier: "com.openai.codex",
+            lastObservedKeyCode: 36,
+            lastFailure: nil
+        )
+
+        let text = GuardStatusFormatter.detailText(for: status)
+
+        XCTAssertTrue(text.contains("辅助功能：已通过监听验证"))
+        XCTAssertTrue(text.contains("输入监控：已通过监听验证"))
+        XCTAssertTrue(text.contains("键盘监听：开启"))
+    }
 }

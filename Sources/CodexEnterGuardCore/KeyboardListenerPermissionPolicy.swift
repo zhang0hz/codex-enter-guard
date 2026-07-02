@@ -5,4 +5,18 @@ public enum KeyboardListenerPermissionPolicy {
     ) -> Bool {
         accessibilityGranted && inputMonitoringGranted
     }
+
+    public static func shouldAutoStartListener(
+        accessibilityGranted: Bool,
+        inputMonitoringGranted: Bool,
+        listenerRunning: Bool,
+        protectionEnabled: Bool
+    ) -> Bool {
+        protectionEnabled &&
+            !listenerRunning &&
+            canAttemptListener(
+                accessibilityGranted: accessibilityGranted,
+                inputMonitoringGranted: inputMonitoringGranted
+            )
+    }
 }

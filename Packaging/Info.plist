@@ -25,7 +25,5 @@
   <string>13.0</string>
   <key>LSUIElement</key>
   <true/>
-  <key>NSAppleEventsUsageDescription</key>
-  <string>Codex 防误发只会在 Codex 位于前台时，把普通回车键改成 Shift + 回车键。</string>
 </dict>
 </plist>

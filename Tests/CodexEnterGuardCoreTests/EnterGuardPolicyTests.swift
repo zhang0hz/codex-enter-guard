@@ -48,6 +48,28 @@ final class EnterGuardPolicyTests: XCTestCase {
         XCTAssertFalse(policy.shouldRewriteToShiftReturn(event))
     }
 
+    func testDoesNotRewriteFunctionReturn() {
+        let event = KeyEventSnapshot(
+            frontmostBundleIdentifier: "com.openai.codex",
+            keyCode: KeyCodes.returnOrEnter,
+            modifierFlags: [.function],
+            phase: .keyDown
+        )
+
+        XCTAssertFalse(policy.shouldRewriteToShiftReturn(event))
+    }
+
+    func testRewritesKeypadEnterWithNumericPadFlag() {
+        let event = KeyEventSnapshot(
+            frontmostBundleIdentifier: "com.openai.codex",
+            keyCode: KeyCodes.keypadEnter,
+            modifierFlags: [.numericPad],
+            phase: .keyDown
+        )
+
+        XCTAssertTrue(policy.shouldRewriteToShiftReturn(event))
+    }
+
     func testDoesNotRewriteWhenAnotherAppIsFrontmost() {
         let event = KeyEventSnapshot(
             frontmostBundleIdentifier: "com.apple.TextEdit",
